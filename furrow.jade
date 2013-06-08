@@ -5,10 +5,9 @@ head
 body
   {{> header}}
   main
-    h1 Welcome to Furrow
-    p Ethel uses Furrow to ask her friends around for tea. Ernest knows he can call on his trusted neighbours at the touch of a button when a stranger knocks at the door. Nellie’s daughter sends her new photos of her grandchild—and old ones of family holidays.
-    p Tend lets you keep in touch with your closest family and friends.
-    p
-      span#login Join now >
-  {{> friendslist}}
+    {{#if currentUser}}
+      {{> friendslist}}
+    {{else}}
+      {{> welcome}}
+    {{/if}}
   {{> footer}}

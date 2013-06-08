@@ -1,5 +1,4 @@
 template(name="friendslist")
-  {{#if currentUser}}
   #friends
     ul
       {{#each friends}}
@@ -8,4 +7,3 @@ template(name="friendslist")
           img(src="{{image.url}}")
           | {{displayName}}
       {{/each}}
-  {{/if}}
