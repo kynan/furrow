@@ -2,6 +2,7 @@ if Meteor.isClient
   Accounts.ui.config
     requestPermissions:
       google: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email']
+    requestOfflineToken: true
   Meteor.startup ->
     Deps.autorun (c) ->
       if Meteor.user()
