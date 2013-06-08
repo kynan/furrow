@@ -3,6 +3,9 @@ template(name="friendslist")
   #friends
     ul
       {{#each friends}}
-      li {{displayName}}
+      li
+        a(href="{{url}}")
+          img(src="{{image.url}}")
+          | {{displayName}}
       {{/each}}
   {{/if}}
