@@ -1,0 +1,8 @@
+template(name="friendslist")
+  {{#if currentUser}}
+  #friends
+    ul
+      {{#each friends}}
+      li {{displayName}}
+      {{/each}}
+  {{/if}}

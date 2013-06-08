@@ -1,27 +1,19 @@
 if Meteor.isClient
+  Accounts.ui.config
+    requestPermissions:
+      google: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email']
   Meteor.startup ->
-    Template.hello.greeting = ->
-      "Welcome to furrow."
-
-    Template.hello.events "click input": ->
-      # template data, if any, is available in 'this'
-      console.log "You pressed the button"
-
-    Template.auth.events
-      "click #login": (evt) ->
-        Meteor.loginWithGoogle (err) ->
-          Meteor._debug err  if err
-
-        evt.preventDefault()
-
-      "click #logout": (evt) ->
-        Meteor.logout (err) ->
-          Meteor._debug err  if err
-
-        evt.preventDefault()
+    Deps.autorun (c) ->
+      if Meteor.user()
+        console.log Meteor.user()
+        Meteor.http.get 'https://www.googleapis.com/plus/v1/people/me/people/visible?access_token=' + Meteor.user().services.google.accessToken, (err, res) ->
+          Meteor._debug err if err?
+          if !err
+            Session.set("friendslist", res.data.items)
+    Template.friendslist.friends = () ->
+      Session.get("friendslist")
 
 if Meteor.isServer
   Meteor.startup ->
-
 
 # code to run on server at startup
