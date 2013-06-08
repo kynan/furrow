@@ -1,0 +1,18 @@
+{
+  "meteor": {},
+  "dependencies": {
+    "basePackages": {
+      "jade-handlebars": {
+        "git": "git://github.com/SimonDegraeve/meteor-jade-handlebars.git",
+        "branch": "master"
+      }
+    },
+    "packages": {
+      "jade-handlebars": {
+        "git": "git://github.com/SimonDegraeve/meteor-jade-handlebars.git",
+        "branch": "master",
+        "commit": "f77235f9fd41b6ab1cfc2b624fb7a0bcbaaeb358"
+      }
+    }
+  }
+}

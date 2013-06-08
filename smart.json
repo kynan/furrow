@@ -1,0 +1,8 @@
+{
+  "packages": {
+    "jade-handlebars": {
+      "git": "git://github.com/SimonDegraeve/meteor-jade-handlebars.git",
+      "branch": "master"
+    }
+  }
+}
