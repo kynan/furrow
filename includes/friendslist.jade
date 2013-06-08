@@ -6,4 +6,9 @@ template(name="friendslist")
         a(href="{{url}}")
           img(src="{{image.url}}")
           | {{displayName}}
+        {{#if _id}}
+        button connect
+        {{else}}
+        button invite
+        {{/if}}
       {{/each}}

@@ -7,7 +7,14 @@ if Meteor.isClient
     url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
       Meteor._debug err if err?
-      Session.set("friendslist", res.data.items) if !err?
+      if !err?
+        friends = res.data.items
+        # Check whether any of your friends is already registered
+        for friend in friends
+          user = Meteor.users.findOne 'services.google.id': friend.id
+          friend._id = user._id if user
+          console.log friend if user
+        Session.set("friendslist", friends) if !err?
   Meteor.startup ->
     Deps.autorun (c) ->
       if Meteor.user()
