@@ -6,12 +6,12 @@ body
   {{> header}}
   {{> notifications}}
   main
+    {{loginButtons align=right}}
     {{#if currentUser}}
       {{> setmood}}
       {{> mood}}
       {{> friendslist}}
     {{else}}
       {{> welcome}}
-      {{loginButtons align=right}}
     {{/if}}
   {{> footer}}
