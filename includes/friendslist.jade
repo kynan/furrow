@@ -7,19 +7,19 @@ template(name="friendslist")
       li
         aside.pack-end
           img(src="{{image.url}}")
+        {{#if is_friend}}
+        aside
+          button.unfriend(id="{{_id}}") unfriend
+        {{else}}
+        {{#if _id}}
+        aside
+          button.connect(id="{{_id}}") connect
+        {{else}}
+        aside
+          button.invite invite
+        {{/if}}
+        {{/if}}
         a(href="{{url}}")
-          {{#if is_friend}}
-          aside
-            button.unfriend(id="{{_id}}") unfriend
-          {{else}}
-          {{#if _id}}
-          aside
-            button.connect(id="{{_id}}") connect
-          {{else}}
-          aside
-            button.invite invite
-          {{/if}}
-          {{/if}}
           p {{displayName}}
           {{#if is_following}}
           p You are a friend
