@@ -13,20 +13,12 @@ body
   {{/if}}
 
 template(name="main")
-  section(role="region")
-    {{#if moodpane}}
-      header
-        menu(type="toolbar")
-          a.friends
-            span.icon.icon-user Friends
-        h1 Furrow: your mood
-      {{> setmood}}
-      {{> mood}}
-    {{else}}
-      header
-        menu(type="toolbar")
-          a.mood
-            span.icon.icon-compose Mood
-        h1 Furrow: your friends
-      {{> friendslist}}
-    {{/if}}
+  {{#if moodpane}}
+    {{> mood}}
+  {{/if}}
+  {{#if friendspane}}
+    {{> friendslist}}
+  {{/if}}
+  {{#if editpane}}
+    {{> setmood}}
+  {{/if}}

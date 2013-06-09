@@ -73,7 +73,7 @@ if Meteor.isClient
         Meteor.users.update _id: evt.target.id, {$addToSet: {friends: Meteor.userId()}}
         ConnectionRequests.remove evt.target.attributes.requestId.value
     Template.setmood.events =
-      'submit form#setmood': (evt, template) ->
+      'click a.submit': (evt, template) ->
         console.log 'set mood', evt, template
         evt.preventDefault()
         Mood.insert
@@ -81,9 +81,13 @@ if Meteor.isClient
           mood: template.find("select#mood").value
           message: template.find("input#message").value
           createdAt: Date.now()
-        evt.target.reset()
+        Session.set 'pane', 'mood'
     Template.mood.moods = () ->
       Session.get "moods"
+    Template.main.editpane = () ->
+      Session.equals 'pane', 'edit'
+    Template.main.friendspane = () ->
+      Session.equals 'pane', 'friends'
     Template.main.moodpane = () ->
       Session.equals 'pane', 'mood'
     Template.main.events =
@@ -91,6 +95,10 @@ if Meteor.isClient
         Session.set 'pane', 'mood'
       'click a.friends': () ->
         Session.set 'pane', 'friends'
+      'click a.edit': () ->
+        Session.set 'pane', 'edit'
+      'click a.close': (evt, template) ->
+        Session.set 'pane', 'mood'
 
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client

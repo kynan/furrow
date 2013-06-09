@@ -1,10 +1,18 @@
 template(name="setmood")
-  article#moodform
-    h1 How do you feel right now?
-    form#setmood
-      select#mood
-        option great
-        option fair
-        option down
-      input#message(type="text", placeholder="Add a message")
-      button(type="submit) Send
+  section.skin-organic(role="region")
+    header
+      a.close
+        span.icon.icon-close close
+      menu(type="toolbar")
+        a.submit
+          span.icon.icon-send submit
+      h1 How do you feel?
+    article
+      form#setmood
+        p
+          select#mood
+            option great
+            option fair
+            option down
+        p
+          input#message(type="text", placeholder="Add a message")
