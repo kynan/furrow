@@ -1,5 +1,6 @@
 template(name="friendslist")
-  #friends
+  {{#if friends}}
+  #friends Connect to your friends:
     ul
       {{#each friends}}
       li
@@ -7,8 +8,9 @@ template(name="friendslist")
           img(src="{{image.url}}")
           | {{displayName}}
         {{#if _id}}
-        button connect
+        button.connect(id="{{_id}}") connect
         {{else}}
-        button invite
+        button.invite invite
         {{/if}}
       {{/each}}
+  {{/if}}
