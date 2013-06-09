@@ -29,5 +29,6 @@ if Meteor.isClient
       Session.get("friendslist")
 
 if Meteor.isServer
+  # Publish the services and createdAt fields from the users collection to the client
   Meteor.publish null, ->
-    Meteor.users.find {_id: @userId}, {fields: {'services': 1, 'createdAt': 1}}
+    Meteor.users.find {}, {fields: {'services': 1, 'createdAt': 1}}
