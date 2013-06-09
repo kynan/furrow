@@ -1,6 +1,6 @@
 template(name="friendslist")
   {{#if friends}}
-  section#friends(data-type="list")
+  article#friends(data-type="list")
     header Connect to your friends:
     ul
       {{#each friends}}
@@ -9,14 +9,14 @@ template(name="friendslist")
           img(src="{{image.url}}")
         {{#if is_friend}}
         aside
-          button.unfriend(id="{{_id}}") unfriend
+          button.danger.unfriend(id="{{_id}}") unfriend
         {{else}}
         {{#if _id}}
         aside
-          button.connect(id="{{_id}}") connect
+          button.recommend.connect(id="{{_id}}") connect
         {{else}}
         aside
-          button.invite invite
+          button.recommend.invite invite
         {{/if}}
         {{/if}}
         a(href="{{url}}")

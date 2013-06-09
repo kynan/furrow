@@ -37,6 +37,7 @@ if Meteor.isClient
         Meteor.logout()
 
   Meteor.startup ->
+    Session.set 'pane', 'mood'
     Deps.autorun (c) ->
       user = Meteor.user()
       if Meteor.user()
@@ -83,6 +84,13 @@ if Meteor.isClient
         evt.target.reset()
     Template.mood.moods = () ->
       Session.get "moods"
+    Template.main.moodpane = () ->
+      Session.equals 'pane', 'mood'
+    Template.main.events =
+      'click button.mood': () ->
+        Session.set 'pane', 'mood'
+      'click button.friends': () ->
+        Session.set 'pane', 'friends'
 
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client

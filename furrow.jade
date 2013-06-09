@@ -8,10 +8,18 @@ body
   main
     {{loginButtons align=right}}
     {{#if currentUser}}
-      {{> setmood}}
-      {{> mood}}
-      {{> friendslist}}
+      {{> main}}
     {{else}}
       {{> welcome}}
     {{/if}}
   {{> footer}}
+
+template(name="main")
+  {{#if moodpane}}
+    button.friends Friends
+    {{> setmood}}
+    {{> mood}}
+  {{else}}
+    button.mood Mood
+    {{> friendslist}}
+  {{/if}}
