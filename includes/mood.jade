@@ -17,6 +17,6 @@ template(name="mood")
             img(src="{{image.url}}")
           a(href="{{url}}")
             p {{displayName}}
-            p is feeling {{mood.mood}}: {{mood.message}} ({{mood.createdAt}})
+            p is feeling {{mood.mood}}: {{mood.message}} ({{mood.modified}})
         {{/each}}
     {{/if}}

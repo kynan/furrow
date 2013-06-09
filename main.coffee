@@ -51,6 +51,8 @@ if Meteor.isClient
           Meteor.subscribe "mood", user.friends
           getMood = (friend) ->
             friend.mood = Mood.findOne {userId: friend._id}, {sort: {createdAt: -1}}
+            if friend.mood?.createdAt?
+              friend.mood.modified = humanized_time_span friend.mood.createdAt
             return friend
           moods = (getMood friend for friend in Session.get "friendslist")
           console.log 'moods', moods
