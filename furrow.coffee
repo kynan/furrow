@@ -28,6 +28,7 @@ if Meteor.isClient
             friend._id = user._id
             friend.is_friend = user._id in me.friends if me.friends
             friend.is_following = me._id in user.friends if user.friends
+            friend.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
             console.log friend
         Session.set("contactlist", friends)
         return Session.set("friendslist", (f for f in friends when f.is_friend))
@@ -66,7 +67,7 @@ if Meteor.isClient
         console.log 'unfriend', evt, template
         Meteor.users.update _id: Meteor.userId(), {$pull: {friends: evt.target.id}}
     Template.notifications.connectionRequests = () ->
-      ConnectionRequests.find()
+      ConnectionRequests.find userId: Meteor.userId()
     Template.notifications.events =
       'click button.accept': (evt, template) ->
         console.log 'accept', evt, template
@@ -105,7 +106,7 @@ if Meteor.isServer
   Meteor.publish null, ->
     Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1}}
   Meteor.publish "connection_requests", ->
-    ConnectionRequests.find userId: @userId
+    ConnectionRequests.find {$or: [{userId: @userId}, {'requester._id': @userId}]}
   Meteor.publish "mood", (users)->
     check(users, Array)
     Mood.find userId: {$in: users}

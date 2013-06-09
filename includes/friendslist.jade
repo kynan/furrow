@@ -19,12 +19,17 @@ template(name="friendslist")
           aside
             button.danger.unfriend(id="{{_id}}") unfriend
           {{else}}
+          {{#if is_invited}}
+          aside
+            button.disabled invited
+          {{else}}
           {{#if _id}}
           aside
             button.recommend.connect(id="{{_id}}") connect
           {{else}}
           aside
             button.recommend.invite invite
+          {{/if}}
           {{/if}}
           {{/if}}
           a(href="{{url}}")
