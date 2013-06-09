@@ -1,4 +1,5 @@
 ConnectionRequests = new Meteor.Collection "connection_requests"
+Mood = new Meteor.Collection "mood"
 
 if Meteor.isClient
   Accounts.ui.config
@@ -61,6 +62,16 @@ if Meteor.isClient
         console.log 'accept', evt, template
         Meteor.users.update _id: evt.target.id, {$addToSet: {friends: Meteor.userId()}}
         ConnectionRequests.remove evt.target.attributes.requestId.value
+    Template.setmood.events =
+      'submit form#setmood': (evt, template) ->
+        console.log 'set mood', evt, template
+        evt.preventDefault()
+        Mood.insert
+          userId: Meteor.userId()
+          mood: template.find("select#mood").value
+          message: template.find("input#message").value
+          createdAt: Date.now()
+        evt.target.reset()
 
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
