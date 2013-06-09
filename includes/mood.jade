@@ -1,0 +1,8 @@
+template(name="mood")
+  {{#if moods}}
+  #moods See how your friends are feeling right now
+    ul
+      {{#each moods}}
+      li {{mood}} {{message}} {{createdAt}}
+      {{/each}}
+  {{/if}}

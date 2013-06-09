@@ -77,6 +77,8 @@ if Meteor.isClient
           message: template.find("input#message").value
           createdAt: Date.now()
         evt.target.reset()
+    Template.mood.moods = () ->
+      Session.get "moods"
 
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
