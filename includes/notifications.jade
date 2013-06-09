@@ -1,0 +1,15 @@
+template(name="notifications")
+  #notifications
+    {{#if connectionRequests.count}}
+    #connection-requests Outstanding connection requests
+      ul
+        {{#each connectionRequests}}
+        li
+          a(href="{{requester.url}}")
+            img(src="{{requester.image.url}}")
+            | {{requester.displayName}}
+          {{#if requester._id}}
+          button.accept(id="{{requester._id}}") accept
+          {{/if}}
+        {{/each}}
+    {{/if}}

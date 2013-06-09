@@ -47,6 +47,8 @@ if Meteor.isClient
         ConnectionRequests.insert
           userId: evt.target.id
           requester: Session.get("profile")
+    Template.notifications.connectionRequests = () ->
+      ConnectionRequests.find()
 
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
