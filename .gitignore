@@ -3,3 +3,4 @@ Thumbs.db
 node_modules/
 .env
 *.html
+npm-debug.log
