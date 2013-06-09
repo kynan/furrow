@@ -3,6 +3,14 @@ if Meteor.isClient
     requestPermissions:
       google: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email']
     requestOfflineToken: true
+  getProfile = (token) ->
+    url = 'https://www.googleapis.com/plus/v1/people/me'
+    Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
+      Meteor._debug err if err?
+      console.log res
+      profile = res.data
+      profile._id = Meteor.userId()
+      Session.set("profile", res.data)
   getFriendsList = (token) ->
     url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
@@ -22,9 +30,12 @@ if Meteor.isClient
 
   Meteor.startup ->
     Deps.autorun (c) ->
-      if Meteor.user()
-        console.log Meteor.user()
-        getFriendsList Meteor.user().services.google.accessToken
+      user = Meteor.user()
+      if user
+        console.log user
+        if user.services?.google?.accessToken?
+          getFriendsList user.services.google.accessToken
+          getProfile user.services.google.accessToken
     Template.friendslist.friends = () ->
       Session.get("friendslist")
 
