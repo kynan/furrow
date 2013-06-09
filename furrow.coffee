@@ -14,7 +14,12 @@ if Meteor.isClient
           user = Meteor.users.findOne 'services.google.id': friend.id
           friend._id = user._id if user
           console.log friend if user
-        Session.set("friendslist", friends) if !err?
+        return Session.set("friendslist", friends)
+      # Log out if auth token has expired; should no longer be necessary once
+      # https://github.com/meteor/meteor/pull/522 is merged
+      if err.response.statusCode == 401 or err.response.statusCode == 403
+        Meteor.logout()
+
   Meteor.startup ->
     Deps.autorun (c) ->
       if Meteor.user()
