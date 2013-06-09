@@ -9,7 +9,7 @@ template(name="notifications")
             img(src="{{requester.image.url}}")
             | {{requester.displayName}}
           {{#if requester._id}}
-          button.accept(id="{{requester._id}}") accept
+          button.accept(id="{{requester._id}}", requestId="{{_id}}") accept
           {{/if}}
         {{/each}}
     {{/if}}

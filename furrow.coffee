@@ -49,6 +49,11 @@ if Meteor.isClient
           requester: Session.get("profile")
     Template.notifications.connectionRequests = () ->
       ConnectionRequests.find()
+    Template.notifications.events =
+      'click button.accept': (evt, template) ->
+        console.log evt, template
+        Meteor.users.update _id: evt.target.id, {$addToSet: {friends: Meteor.userId()}}
+        ConnectionRequests.remove evt.target.attributes.requestId.value
 
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
@@ -56,3 +61,7 @@ if Meteor.isServer
     Meteor.users.find {}, {fields: {'services': 1, 'createdAt': 1}}
   Meteor.publish "connection_requests", ->
     ConnectionRequests.find userId: @userId
+  Meteor.users.allow
+    update: (userId, doc) ->
+      console.log userId, doc
+      return ConnectionRequests.findOne userId: userId
