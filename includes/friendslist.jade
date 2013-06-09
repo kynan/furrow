@@ -1,0 +1,23 @@
+template(name="friendslist")
+  {{#if friends}}
+  #friends Connect to your friends:
+    ul
+      {{#each friends}}
+      li
+        a(href="{{url}}")
+          img(src="{{image.url}}")
+          | {{displayName}}
+        {{#if is_friend}}
+        button.unfriend(id="{{_id}}") unfriend
+        {{else}}
+          {{#if _id}}
+          button.connect(id="{{_id}}") connect
+          {{else}}
+          button.invite invite
+          {{/if}}
+        {{/if}}
+        {{#if is_following}}
+        span you are a friend
+        {{/if}}
+      {{/each}}
+  {{/if}}
