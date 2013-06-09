@@ -7,10 +7,17 @@ template(name="friendslist")
         a(href="{{url}}")
           img(src="{{image.url}}")
           | {{displayName}}
-        {{#if _id}}
-        button.connect(id="{{_id}}") connect
+        {{#if is_friend}}
+        button.unfriend(id="{{_id}}") unfriend
         {{else}}
-        button.invite invite
+          {{#if _id}}
+          button.connect(id="{{_id}}") connect
+          {{else}}
+          button.invite invite
+          {{/if}}
+        {{/if}}
+        {{#if is_following}}
+        span you are a friend
         {{/if}}
       {{/each}}
   {{/if}}

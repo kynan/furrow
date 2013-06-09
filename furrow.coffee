@@ -18,12 +18,16 @@ if Meteor.isClient
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
       Meteor._debug err if err?
       if !err?
+        me = Meteor.user()
         friends = res.data.items
         # Check whether any of your friends is already registered
         for friend in friends
           user = Meteor.users.findOne 'services.google.id': friend.id
-          friend._id = user._id if user
-          console.log friend if user
+          if user
+            friend._id = user._id
+            friend.is_friend = user._id in me.friends if me.friends
+            friend.is_following = me._id in user.friends if user.friends
+            console.log friend
         return Session.set("friendslist", friends)
       # Log out if auth token has expired; should no longer be necessary once
       # https://github.com/meteor/meteor/pull/522 is merged
@@ -58,7 +62,7 @@ if Meteor.isClient
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
   Meteor.publish null, ->
-    Meteor.users.find {}, {fields: {'services': 1, 'createdAt': 1}}
+    Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1}}
   Meteor.publish "connection_requests", ->
     ConnectionRequests.find userId: @userId
   Meteor.users.allow
