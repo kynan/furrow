@@ -7,6 +7,7 @@ body
   {{> notifications}}
   main
     {{#if currentUser}}
+      {{> setmood}}
       {{> friendslist}}
     {{else}}
       {{> welcome}}
