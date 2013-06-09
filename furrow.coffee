@@ -44,6 +44,11 @@ if Meteor.isClient
           getFriendsList user.services.google.accessToken
           getProfile user.services.google.accessToken
         Meteor.subscribe "connection_requests"
+        if user.friends
+          Meteor.subscribe "mood", user.friends
+          moods = (Mood.findOne {userId: friend}, {sort: {createdAt: -1}} for friend in Meteor.user().friends)
+          console.log 'moods', moods
+          Session.set "moods", moods
     Template.friendslist.friends = () ->
       Session.get("friendslist")
     Template.friendslist.events =
@@ -79,6 +84,9 @@ if Meteor.isServer
     Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1}}
   Meteor.publish "connection_requests", ->
     ConnectionRequests.find userId: @userId
+  Meteor.publish "mood", (users)->
+    check(users, Array)
+    Mood.find userId: {$in: users}
   Meteor.users.allow
     update: (userId, doc) ->
       console.log userId, doc
