@@ -1,3 +1,5 @@
+ConnectionRequests = new Meteor.Collection "connection_requests"
+
 if Meteor.isClient
   Accounts.ui.config
     requestPermissions:
@@ -38,6 +40,12 @@ if Meteor.isClient
           getProfile user.services.google.accessToken
     Template.friendslist.friends = () ->
       Session.get("friendslist")
+    Template.friendslist.events =
+      'click button.connect': (evt, template) ->
+        console.log evt, template
+        ConnectionRequests.insert
+          userId: evt.target.id
+          requester: Session.get("profile")
 
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
