@@ -6,6 +6,7 @@ body
   {{> notifications}}
   {{#if currentUser}}
     {{> main}}
+    {{loginButtons align=right}}
   {{else}}
     {{> welcome}}
     {{loginButtons align=right}}
