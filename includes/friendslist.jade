@@ -1,23 +1,27 @@
 template(name="friendslist")
   {{#if friends}}
-  #friends Connect to your friends:
+  article#friends(data-type="list") Connect to your friends:
     ul
       {{#each friends}}
       li
-        a(href="{{url}}")
+        aside.pack-end
           img(src="{{image.url}}")
-          | {{displayName}}
+        a(href="{{url}}")
         {{#if is_friend}}
-        button.unfriend(id="{{_id}}") unfriend
+          aside
+            button.unfriend(id="{{_id}}") unfriend
         {{else}}
           {{#if _id}}
-          button.connect(id="{{_id}}") connect
+          aside
+            button.connect(id="{{_id}}") connect
           {{else}}
-          button.invite invite
+          aside
+            button.invite invite
           {{/if}}
         {{/if}}
+          p {{displayName}}
         {{#if is_following}}
-        span you are a friend
+          p You are a friend
         {{/if}}
       {{/each}}
   {{/if}}
