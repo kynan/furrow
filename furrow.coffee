@@ -29,7 +29,8 @@ if Meteor.isClient
             friend.is_friend = user._id in me.friends if me.friends
             friend.is_following = me._id in user.friends if user.friends
             console.log friend
-        return Session.set("friendslist", friends)
+        Session.set("contactlist", friends)
+        return Session.set("friendslist", (f for f in friends when f.is_friend))
       # Log out if auth token has expired; should no longer be necessary once
       # https://github.com/meteor/meteor/pull/522 is merged
       if err.response.statusCode == 401 or err.response.statusCode == 403
@@ -46,11 +47,14 @@ if Meteor.isClient
         Meteor.subscribe "connection_requests"
         if user.friends
           Meteor.subscribe "mood", user.friends
-          moods = (Mood.findOne {userId: friend}, {sort: {createdAt: -1}} for friend in Meteor.user().friends)
+          getMood = (friend) ->
+            friend.mood = Mood.findOne {userId: friend._id}, {sort: {createdAt: -1}}
+            return friend
+          moods = (getMood friend for friend in Session.get "friendslist")
           console.log 'moods', moods
           Session.set "moods", moods
     Template.friendslist.friends = () ->
-      Session.get("friendslist")
+      Session.get("contactlist")
     Template.friendslist.events =
       'click button.connect': (evt, template) ->
         console.log evt, template

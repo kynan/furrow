@@ -3,6 +3,10 @@ template(name="mood")
   #moods See how your friends are feeling right now
     ul
       {{#each moods}}
-      li {{mood}} {{message}} {{createdAt}}
+      li
+        a(href="{{url}}")
+          img(src="{{image.url}}")
+          | {{displayName}}
+        span is feeling {{mood.mood}}: {{mood.message}} ({{mood.createdAt}})
       {{/each}}
   {{/if}}
