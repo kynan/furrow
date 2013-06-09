@@ -37,7 +37,7 @@ if Meteor.isClient
   Meteor.startup ->
     Deps.autorun (c) ->
       user = Meteor.user()
-      if user
+      if Meteor.user()
         console.log user
         if user.services?.google?.accessToken?
           getFriendsList user.services.google.accessToken
@@ -51,11 +51,14 @@ if Meteor.isClient
         ConnectionRequests.insert
           userId: evt.target.id
           requester: Session.get("profile")
+      'click button.unfriend': (evt, template) ->
+        console.log 'unfriend', evt, template
+        Meteor.users.update _id: Meteor.userId(), {$pull: {friends: evt.target.id}}
     Template.notifications.connectionRequests = () ->
       ConnectionRequests.find()
     Template.notifications.events =
       'click button.accept': (evt, template) ->
-        console.log evt, template
+        console.log 'accept', evt, template
         Meteor.users.update _id: evt.target.id, {$addToSet: {friends: Meteor.userId()}}
         ConnectionRequests.remove evt.target.attributes.requestId.value
 
@@ -68,4 +71,4 @@ if Meteor.isServer
   Meteor.users.allow
     update: (userId, doc) ->
       console.log userId, doc
-      return ConnectionRequests.findOne userId: userId
+      return userId == doc._id or ConnectionRequests.findOne userId: userId
