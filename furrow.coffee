@@ -29,6 +29,5 @@ if Meteor.isClient
       Session.get("friendslist")
 
 if Meteor.isServer
-  Meteor.startup ->
-
-# code to run on server at startup
+  Meteor.publish null, ->
+    Meteor.users.find {_id: @userId}, {fields: {'services': 1, 'createdAt': 1}}
