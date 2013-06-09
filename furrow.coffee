@@ -38,6 +38,7 @@ if Meteor.isClient
         if user.services?.google?.accessToken?
           getFriendsList user.services.google.accessToken
           getProfile user.services.google.accessToken
+        Meteor.subscribe "connection_requests"
     Template.friendslist.friends = () ->
       Session.get("friendslist")
     Template.friendslist.events =
@@ -51,3 +52,5 @@ if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
   Meteor.publish null, ->
     Meteor.users.find {}, {fields: {'services': 1, 'createdAt': 1}}
+  Meteor.publish "connection_requests", ->
+    ConnectionRequests.find userId: @userId
