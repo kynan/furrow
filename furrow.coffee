@@ -87,9 +87,9 @@ if Meteor.isClient
     Template.main.moodpane = () ->
       Session.equals 'pane', 'mood'
     Template.main.events =
-      'click button.mood': () ->
+      'click a.mood': () ->
         Session.set 'pane', 'mood'
-      'click button.friends': () ->
+      'click a.friends': () ->
         Session.set 'pane', 'friends'
 
 if Meteor.isServer

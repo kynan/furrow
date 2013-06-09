@@ -3,23 +3,29 @@ head
   title Furrow
   meta(name='viewport', content='width=device-width')
 body
-  {{> header}}
   {{> notifications}}
-  main
+  {{#if currentUser}}
+    {{> main}}
+  {{else}}
+    {{> welcome}}
     {{loginButtons align=right}}
-    {{#if currentUser}}
-      {{> main}}
-    {{else}}
-      {{> welcome}}
-    {{/if}}
-  {{> footer}}
+  {{/if}}
 
 template(name="main")
-  {{#if moodpane}}
-    button.friends Friends
-    {{> setmood}}
-    {{> mood}}
-  {{else}}
-    button.mood Mood
-    {{> friendslist}}
-  {{/if}}
+  section(role="region")
+    {{#if moodpane}}
+      header
+        menu(type="toolbar")
+          a.friends
+            span.icon.icon-user Friends
+        h1 Furrow: your mood
+      {{> setmood}}
+      {{> mood}}
+    {{else}}
+      header
+        menu(type="toolbar")
+          a.mood
+            span.icon.icon-compose Mood
+        h1 Furrow: your friends
+      {{> friendslist}}
+    {{/if}}
