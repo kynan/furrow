@@ -2,6 +2,5 @@ Thumbs.db
 .DS_Store
 node_modules/
 .env
-*.html
 npm-debug.log
 .meteor/
