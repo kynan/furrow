@@ -6,6 +6,7 @@ if Meteor.isClient
     requestPermissions:
       google: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email']
     requestOfflineToken: true
+    passwordSignupFields: 'USERNAME_AND_EMAIL'
   getProfile = (token) ->
     url = 'https://www.googleapis.com/plus/v1/people/me'
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
