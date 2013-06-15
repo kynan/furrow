@@ -36,7 +36,7 @@ if Meteor.isClient
             friend.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
             console.log friend
         for contactindex in [0..user.contacts.length]
-            if me.contacts[contactindex]._id === friend._id
+            if me.contacts[contactindex]._id == friend._id
               me.contacts[contactindex] = _.extend(user.contacts[contactindex],friend)
               found = true
         me.contacts.push friend if !found
@@ -82,7 +82,7 @@ if Meteor.isClient
           console.log 'moods', moods
           Session.set "moods", moods
     Template.friendslist.friends = () ->
-      user.contacts
+      Meteor.userId().contacts
     Template.friendslist.events =
       'click button.connect': (evt, template) ->
         console.log evt, template
