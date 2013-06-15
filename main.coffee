@@ -77,11 +77,13 @@ if Meteor.isClient
         if user.friends
           Meteor.subscribe "mood", user.friends
           getMood = (friend) ->
-            friend.mood = Mood.findOne {userId: friend._id}, {sort: {createdAt: -1}}
-            if friend.mood?.createdAt?
-              friend.mood.modified = humanized_time_span friend.mood.createdAt
-            return friend
-          moods = (getMood friend for friend in Meteor.user.friends)
+            # FIXME: This should really be a method on the server
+            profile = Meteor.users.findOne(_id: friend).profile
+            profile.mood = Mood.findOne {userId: friend}, {sort: {createdAt: -1}}
+            if profile.mood?.createdAt?
+              profile.mood.modified = humanized_time_span profile.mood.createdAt
+            return profile
+          moods = (getMood friend for friend in Meteor.user().friends)
           console.log 'moods', moods
           Session.set "moods", moods
     Template.friendslist.friends = () ->
@@ -118,7 +120,7 @@ if Meteor.isClient
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
   Meteor.publish null, ->
-    Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1}}
+    Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1, profile: 1}}
   Meteor.publish "connection_requests", ->
     ConnectionRequests.find {$or: [{userId: @userId}, {'requester._id': @userId}]}
   Meteor.publish "mood", (users)->
