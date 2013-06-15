@@ -14,9 +14,11 @@ if Meteor.isClient
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
       Meteor._debug err if err?
       console.log res
-      profile = res.data
-      profile._id = Meteor.userId()
-      Session.set("profile", res.data)
+      me = Meteor.user()
+      profile = me.profile
+      profile._id = me._id
+      _.extend profile, res.data
+      Meteor.users.update me._id, {$set: {profile: profile}}
   getFriendsList = (token) ->
     url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
@@ -83,7 +85,7 @@ if Meteor.isClient
         console.log evt, template
         ConnectionRequests.insert
           userId: evt.target.id
-          requester: Session.get("profile")
+          requester: Meteor.user().profile
       'click button.unfriend': (evt, template) ->
         console.log 'unfriend', evt, template
         Meteor.users.update _id: Meteor.userId(), {$pull: {friends: evt.target.id}}
