@@ -16,6 +16,9 @@ h1
   font-size 2em
   font-weight 100
 
+section[role="region"] > header:first-child h1
+  margin-left .5em
+
 p#tagline
   font-weight: normal
 
@@ -42,6 +45,9 @@ p#tagline
   display inline-block
   margin 0 .2em
 
-@media all and (min-width: 30em)
+[data-type="list"]
+  padding 0
+
+@media all and (max-width: 720px)
   html
-    font-size 150%
+    font-size 80%
