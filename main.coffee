@@ -17,6 +17,12 @@ if Meteor.isClient
       me = Meteor.user()
       profile = me.profile
       profile._id = me._id
+      # The google profile has a name attribute with a nested hash of
+      # {familyName: ..., givenName: ...}, so we need to rename that, since
+      # it's being used in the Metor displayName template helper
+      res.data.fullName = res.data.name
+      delete res.data.name
+      # Update the user's profile with their google profile
       _.extend profile, res.data
       Meteor.users.update me._id, {$set: {profile: profile}}
   getFriendsList = (token) ->
