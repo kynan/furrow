@@ -36,8 +36,8 @@ if Meteor.isClient
             console.log friend
         for contactindex in [0..user.contacts.length]
             if user.contacts[contactindex]._id === friend._id
-                user.contacts[contactindex] = _.extend(user.contacts[contactindex],friend)
-                found = true
+              user.contacts[contactindex] = _.extend(user.contacts[contactindex],friend)
+              found = true
         user.contacts.push friend if !found
         return Session.set("friendslist", (f for f in user.contacts when f.is_friend))
       # Log out if auth token has expired; should no longer be necessary once
