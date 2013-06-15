@@ -2,9 +2,9 @@ template(name="friendslist")
   section(role="region")
     header
       menu(type="toolbar")
-        a.edit
+        a.edit(href='/edit')
           span.icon.icon-compose Report mood
-        a.mood
+        a.mood(href='/mood')
           span.icon.icon-menu Mood
       h1 Furrow: your friends
     {{#if friends}}
