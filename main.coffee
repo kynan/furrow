@@ -23,26 +23,18 @@ if Meteor.isClient
       Meteor._debug err if err?
       if !err?
         me = Meteor.user()
-        friends = res.data.items
-        # Check whether any of your friends is already registered
-        for friend in friends
-          user = Meteor.users.findOne 'services.google.id': friend.id
-          if me.friends
-            me.friends = []
+        contacts = res.data.items
+        # Check whether any of your contacts is already registered
+        for contact in contacts
+          user = Meteor.users.findOne 'services.google.id': contact.id
           if user
-            friend._id = user._id
-            friend.is_friend = user._id in me.friends if me.friends
-            friend.is_following = me._id in user.friends if user.friends
-            friend.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
-            console.log friend
-          for contactindex in [0..user.contacts.length]
-            if me.contacts[contactindex]._id == friend._id
-              me.contacts[contactindex] = _.extend(user.contacts[contactindex],friend)
-              found = true
-          me.contacts.push(friend) if !found
-        me.friends = (f for f in user.contacts when f.is_friend)
-        Meteor.users.update({_id: me._id},me)
-        return me.friends
+            contact._id = user._id
+            contact.is_friend = user._id in me.friends if me.friends
+            contact.is_following = me._id in user.friends if user.friends
+            contact.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
+            console.log contact
+        Session.set("contactlist", contacts)
+        return Session.set("friendslist", (c for c in contacts when c.is_friend))
       # Log out if auth token has expired; should no longer be necessary once
       # https://github.com/meteor/meteor/pull/522 is merged
       if err.response.statusCode == 401 or err.response.statusCode == 403
@@ -85,7 +77,7 @@ if Meteor.isClient
           console.log 'moods', moods
           Session.set "moods", moods
     Template.friendslist.friends = () ->
-      Meteor.userId().contacts
+      Session.get("contactlist")
     Template.friendslist.events =
       'click button.connect': (evt, template) ->
         console.log evt, template
