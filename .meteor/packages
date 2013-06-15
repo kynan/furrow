@@ -8,4 +8,6 @@ preserve-inputs
 coffeescript
 stylus
 accounts-google
+accounts-password
 accounts-ui
+
