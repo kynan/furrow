@@ -4,7 +4,8 @@ Mood = new Meteor.Collection "mood"
 if Meteor.isClient
   Accounts.ui.config
     requestPermissions:
-      google: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email']
+      google: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email'],
+      facebook: ['read_friendlists', 'read_stream', 'user_photos', 'user_relationships', 'user_status']
     requestOfflineToken: true
     passwordSignupFields: 'USERNAME_AND_EMAIL'
   getProfile = (token) ->
