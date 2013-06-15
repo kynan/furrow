@@ -63,6 +63,7 @@ if Meteor.isClient
     '/friends': 'friendslist'
     '/edit': 'setmood'
     '/welcome': 'welcome'
+    '/invitefriends': 'invitefriends'
 
   Meteor.startup ->
     Deps.autorun (c) ->
