@@ -37,8 +37,23 @@ if Meteor.isClient
       if err.response.statusCode == 401 or err.response.statusCode == 403
         Meteor.logout()
 
+  Meteor.Router.filters
+    requireLogin: (page) ->
+      if Meteor.user()
+        return page
+      else
+        return 'welcome'
+
+  Meteor.Router.filter 'requireLogin', except: 'welcome'
+
+  Meteor.Router.add
+    '/': 'mood'
+    '/mood': 'mood'
+    '/friends': 'friendslist'
+    '/edit': 'setmood'
+    '/welcome': 'welcome'
+
   Meteor.startup ->
-    Session.set 'pane', 'mood'
     Deps.autorun (c) ->
       user = Meteor.user()
       if Meteor.user()
@@ -84,24 +99,9 @@ if Meteor.isClient
           mood: template.find("select#mood").value
           message: template.find("input#message").value
           createdAt: Date.now()
-        Session.set 'pane', 'mood'
+        Meteor.Router.to '/mood'
     Template.mood.moods = () ->
       Session.get "moods"
-    Template.main.editpane = () ->
-      Session.equals 'pane', 'edit'
-    Template.main.friendspane = () ->
-      Session.equals 'pane', 'friends'
-    Template.main.moodpane = () ->
-      Session.equals 'pane', 'mood'
-    Template.main.events =
-      'click a.mood': () ->
-        Session.set 'pane', 'mood'
-      'click a.friends': () ->
-        Session.set 'pane', 'friends'
-      'click a.edit': () ->
-        Session.set 'pane', 'edit'
-      'click a.close': (evt, template) ->
-        Session.set 'pane', 'mood'
 
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
