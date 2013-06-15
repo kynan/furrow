@@ -7,6 +7,7 @@ insecure
 preserve-inputs
 coffeescript
 stylus
+accounts-facebook
 accounts-google
 accounts-password
 accounts-ui
