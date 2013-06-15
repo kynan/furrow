@@ -35,10 +35,10 @@ if Meteor.isClient
             friend.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
             console.log friend
         for contactindex in [0..user.contacts.length]
-            if user.contacts[contactindex]._id === friend._id
-              user.contacts[contactindex] = _.extend(user.contacts[contactindex],friend)
+            if me.contacts[contactindex]._id === friend._id
+              me.contacts[contactindex] = _.extend(user.contacts[contactindex],friend)
               found = true
-        user.contacts.push friend if !found
+        me.contacts.push friend if !found
         return Session.set("friendslist", (f for f in user.contacts when f.is_friend))
       # Log out if auth token has expired; should no longer be necessary once
       # https://github.com/meteor/meteor/pull/522 is merged
