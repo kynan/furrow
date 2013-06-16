@@ -10,6 +10,7 @@ if Meteor.isClient
       google: true
     passwordSignupFields: 'USERNAME_AND_EMAIL'
   contactStatus = (user, contact) ->
+    me = Meteor.user()
     contact._id = user._id
     contact.is_friend = user._id in me.friends if me.friends
     contact.is_following = me._id in user.friends if user.friends
@@ -19,7 +20,6 @@ if Meteor.isClient
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
       Meteor._debug err if err?
       if !err?
-        me = Meteor.user()
         contacts = res.data.items
         # Check whether any of your contacts is already registered
         for contact in contacts
@@ -36,7 +36,6 @@ if Meteor.isClient
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
       Meteor._debug err if err?
       if !err?
-        me = Meteor.user()
         contacts = res.data.data
         # Check whether any of your contacts is already registered
         for contact in contacts
