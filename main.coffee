@@ -76,7 +76,7 @@ if Meteor.isClient
         if user.username?
           #normalise name to fullName which is used by google
           #this if is needed as users.update triggers deps.autorun
-          if user.fullName? && user.fullName != user.username
+          if !user.fullName? || user.fullName != user.username
             Meteor.users.update(user._id,{$set: {fullName: user.username}})
         Meteor.subscribe "connection_requests"
         if user.friends
