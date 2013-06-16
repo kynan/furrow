@@ -9,7 +9,12 @@ if Meteor.isClient
     requestOfflineToken:
       google: true
     passwordSignupFields: 'USERNAME_AND_EMAIL'
-  getFriendsList = (token) ->
+  contactStatus = (user, contact) ->
+    contact._id = user._id
+    contact.is_friend = user._id in me.friends if me.friends
+    contact.is_following = me._id in user.friends if user.friends
+    contact.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
+  getGoogleContactList = (token) ->
     url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
       Meteor._debug err if err?
@@ -19,18 +24,28 @@ if Meteor.isClient
         # Check whether any of your contacts is already registered
         for contact in contacts
           user = Meteor.users.findOne 'services.google.id': contact.id
-          if user
-            contact._id = user._id
-            contact.is_friend = user._id in me.friends if me.friends
-            contact.is_following = me._id in user.friends if user.friends
-            contact.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
-            console.log contact
+          contactStatus user, contact if user
         Session.set("contactlist", contacts)
         return Session.set("friendslist", (c for c in contacts when c.is_friend))
       # Log out if auth token has expired; should no longer be necessary once
       # https://github.com/meteor/meteor/pull/522 is merged
       if err.response.statusCode == 401 or err.response.statusCode == 403
-        Meteor.logout()
+        Meteor.Error err.response.statusCode, 'Failed to get Google contacts list', err.response
+  getFacebookContactList = (token) ->
+    url = 'https://graph.facebook.com/me/friends'
+    Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
+      Meteor._debug err if err?
+      if !err?
+        me = Meteor.user()
+        contacts = res.data.data
+        # Check whether any of your contacts is already registered
+        for contact in contacts
+          user = Meteor.users.findOne 'services.facebook.id': contact.id
+          contactStatus user, contact if user
+        Session.set("contactlist", contacts)
+        return Session.set("friendslist", (c for c in contacts when c.is_friend))
+      if err.response.statusCode == 401 or err.response.statusCode == 403
+        Meteor.Error err.response.statusCode, 'Failed to get Google contacts list', err.response
 
   Meteor.Router.filters
     requireLogin: (page) ->
@@ -55,7 +70,9 @@ if Meteor.isClient
       if Meteor.user()
         console.log user
         if user.services?.google?.accessToken?
-          getFriendsList user.services.google.accessToken
+          getGoogleContactList user.services.google.accessToken
+        if user.services?.facebook?.accessToken?
+          getFacebookContactList user.services.facebook.accessToken
         Meteor.subscribe "connection_requests"
         if user.friends
           Meteor.subscribe "mood", user.friends
