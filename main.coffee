@@ -69,7 +69,7 @@ if Meteor.isClient
           moods = (getMood friend for friend in Meteor.user().friends)
           console.log 'moods', moods
           Session.set "moods", moods
-    Template.friendslist.events =
+    Template.peoplelist.events =
       'click button.connect': (evt, template) ->
         console.log evt, template
         ConnectionRequests.insert
@@ -96,8 +96,7 @@ if Meteor.isClient
           createdAt: Date.now()
         Meteor.Router.to '/mood'
     Template.mood.moods = () ->
-      Session.get "moods"
-    people = null #used to communicate 
+      Session.get "moods" 
     Template.invitefriends.events =
       'click button.search': (evt, template) ->
         evt.preventDefault()
@@ -111,13 +110,14 @@ if Meteor.isClient
         oldchild = element.lastChild
         if (oldchild?)
           element.removeChild(element.lastChild)
-        people = potentialusers
+        Session.set('people',potentialusers) 
         element.appendChild(Meteor.render( Template.peoplelist))
-        people = null
      Template.peoplelist.friends = () ->
        #very hacky, if people is undefined then we're probbably rendering
        #friends list
-       people || Session.get("contactlist")
+       value = Session.get('people') || Session.get("contactlist")
+       console.log value
+       return value
 
 if Meteor.isServer
   getGoogleProfile = (user) ->
