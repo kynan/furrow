@@ -75,7 +75,7 @@ if Meteor.isClient
           getProfile user.services.google.accessToken
         if user.username?
           #normalise name to fullName whish is used by google
-          Meteor.users.update({_id: {$eq: user._id} },{$set: {fullName: user.username})
+          Meteor.users.update({_id: {$eq: user._id} },{$set: {fullName: user.username}})
         Meteor.subscribe "connection_requests"
         if user.friends
           Meteor.subscribe "mood", user.friends
