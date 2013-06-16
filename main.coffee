@@ -69,8 +69,6 @@ if Meteor.isClient
           moods = (getMood friend for friend in Meteor.user().friends)
           console.log 'moods', moods
           Session.set "moods", moods
-    Template.friendslist.friends = () ->
-      Session.get("contactlist")
     Template.friendslist.events =
       'click button.connect': (evt, template) ->
         console.log evt, template
@@ -99,19 +97,27 @@ if Meteor.isClient
         Meteor.Router.to '/mood'
     Template.mood.moods = () ->
       Session.get "moods"
+    people = null #used to communicate 
     Template.invitefriends.events =
       'click button.search': (evt, template) ->
         evt.preventDefault()
         evt.stopPropagation()
-        potentialusers = Meteor.users.find({fullName: template.name})
+        console.log template.find('#name')
+        potentialusers = Meteor.users.find({
+          'profile.name': new RegExp(template.find('#name').value) })
+        potentialusers = potentialusers.fetch()
         console.log potentialusers
-        Template.invitefriends.friends = () ->
-          Session.get('people')
         element = template.find('#results')
         oldchild = element.lastChild
         if (oldchild?)
           element.removeChild(element.lastChild)
-        element.appendChild(Meteor.render(Template.peoplelist))
+        people = potentialusers
+        element.appendChild(Meteor.render( Template.peoplelist))
+        people = null
+     Template.peoplelist.friends = () ->
+       #very hacky, if people is undefined then we're probbably rendering
+       #friends list
+       people || Session.get("contactlist")
 
 if Meteor.isServer
   getProfile = (user) ->
@@ -132,12 +138,13 @@ if Meteor.isServer
     console.log 'onCreateUser', options, user
     if user.services?.password?
       profile = options.profile || {}
-      profile.fullName = user.username
+      profile.name = user.username
     if user.services?.google?.accessToken?
       profile = getProfile user
       console.log 'extend', profile, options.profile
       _.extend profile, options.profile
     user.profile = profile
+    console.log 'onCreateUser end', options, user
     return user
   # Publish the services and createdAt fields from the users collection to the client
   Meteor.publish null, ->
