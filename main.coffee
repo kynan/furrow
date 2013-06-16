@@ -117,7 +117,7 @@ if Meteor.isClient
           createdAt: Date.now()
         Meteor.Router.to '/mood'
     Template.mood.moods = () ->
-      Session.get "moods" 
+      Session.get "moods"
     Template.invitefriends.events =
       'click button.search': (evt, template) ->
         evt.preventDefault()
@@ -127,12 +127,12 @@ if Meteor.isClient
           'profile.name': new RegExp(template.find('#name').value) })
         potentialusers = potentialusers.limit(10).fetch()
         console.log potentialusers
-        Session.set('people',potentialusers) 
+        Session.set('people',potentialusers)
      Template.peoplelist.friends = () ->
-       #very hacky, if people is undefined then we're probbably rendering
-       #friends list
-       value = Session.get('people') if Meteor.Router.page() == 'invitefriends'
-       value = Session.get("contactlist") if Meteor.Router.page() == 'friendslist' 
+       if Meteor.Router.page() == 'invitefriends'
+         value = Session.get('people')
+       else
+         value = Session.get("contactlist")
        console.log value
        return value
 
