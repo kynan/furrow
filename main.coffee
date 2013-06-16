@@ -26,6 +26,7 @@ if Meteor.isClient
           user = Meteor.users.findOne 'services.google.id': contact.id
           contactStatus user, contact if user
         Session.set("contactlist", contacts)
+        console.log 'Google contacts', contacts
         return Session.set("friendslist", (c for c in contacts when c.is_friend))
       # Log out if auth token has expired; should no longer be necessary once
       # https://github.com/meteor/meteor/pull/522 is merged
@@ -71,7 +72,6 @@ if Meteor.isClient
     Deps.autorun (c) ->
       user = Meteor.user()
       if Meteor.user()
-        console.log user
         if user.services?.google?.accessToken?
           getGoogleContactList user.services.google.accessToken
         if user.services?.facebook?.accessToken?
@@ -91,7 +91,7 @@ if Meteor.isClient
           Session.set "moods", moods
     Template.peoplelist.events =
       'click button.connect': (evt, template) ->
-        console.log evt, template
+        console.log 'connect', evt, template
         requester = Meteor.user().profile
         requester._id = Meteor.userId()
         ConnectionRequests.insert
@@ -126,15 +126,12 @@ if Meteor.isClient
           'profile.name': new RegExp(template.find('#name').value) }, {limit: 10}).fetch()
         me = Meteor.user()
         potentialusers.filter (user) -> user != me
-        console.log potentialusers
         Session.set('people',potentialusers)
      Template.peoplelist.friends = () ->
        if Meteor.Router.page() == 'invitefriends'
-         value = Session.get('people')
+         return Session.get('people')
        else
-         value = Session.get("contactlist")
-       console.log value
-       return value
+         return Session.get("contactlist")
 
 if Meteor.isServer
   getGoogleProfile = (user) ->
@@ -197,5 +194,4 @@ if Meteor.isServer
     Mood.find userId: {$in: users}
   Meteor.users.allow
     update: (userId, doc) ->
-      console.log userId, doc
       return userId == doc._id or ConnectionRequests.findOne userId: userId
