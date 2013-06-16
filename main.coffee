@@ -14,9 +14,17 @@ if Meteor.isClient
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
       Meteor._debug err if err?
       console.log res
-      profile = res.data
-      profile._id = Meteor.userId()
-      Session.set("profile", res.data)
+      me = Meteor.user()
+      profile = me.profile
+      profile._id = me._id
+      # The google profile has a name attribute with a nested hash of
+      # {familyName: ..., givenName: ...}, so we need to rename that, since
+      # it's being used in the Metor displayName template helper
+      res.data.fullName = res.data.name
+      delete res.data.name
+      # Update the user's profile with their google profile
+      _.extend profile, res.data
+      Meteor.users.update me._id, {$set: {profile: profile}}
   getFriendsList = (token) ->
     url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
@@ -69,11 +77,13 @@ if Meteor.isClient
         if user.friends
           Meteor.subscribe "mood", user.friends
           getMood = (friend) ->
-            friend.mood = Mood.findOne {userId: friend._id}, {sort: {createdAt: -1}}
-            if friend.mood?.createdAt?
-              friend.mood.modified = humanized_time_span friend.mood.createdAt
-            return friend
-          moods = (getMood friend for friend in Meteor.user.friends)
+            # FIXME: This should really be a method on the server
+            profile = Meteor.users.findOne(_id: friend).profile
+            profile.mood = Mood.findOne {userId: friend}, {sort: {createdAt: -1}}
+            if profile.mood?.createdAt?
+              profile.mood.modified = humanized_time_span profile.mood.createdAt
+            return profile
+          moods = (getMood friend for friend in Meteor.user().friends)
           console.log 'moods', moods
           Session.set "moods", moods
     Template.friendslist.friends = () ->
@@ -83,7 +93,7 @@ if Meteor.isClient
         console.log evt, template
         ConnectionRequests.insert
           userId: evt.target.id
-          requester: Session.get("profile")
+          requester: Meteor.user().profile
       'click button.unfriend': (evt, template) ->
         console.log 'unfriend', evt, template
         Meteor.users.update _id: Meteor.userId(), {$pull: {friends: evt.target.id}}
@@ -110,7 +120,7 @@ if Meteor.isClient
 if Meteor.isServer
   # Publish the services and createdAt fields from the users collection to the client
   Meteor.publish null, ->
-    Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1}}
+    Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1, profile: 1}}
   Meteor.publish "connection_requests", ->
     ConnectionRequests.find {$or: [{userId: @userId}, {'requester._id': @userId}]}
   Meteor.publish "mood", (users)->
