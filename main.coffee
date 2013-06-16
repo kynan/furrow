@@ -121,11 +121,8 @@ if Meteor.isClient
     Template.invitefriends.events =
       'click button.search': (evt, template) ->
         evt.preventDefault()
-        evt.stopPropagation()
-        console.log template.find('#name')
         potentialusers = Meteor.users.find({
-          'profile.name': new RegExp(template.find('#name').value) })
-        potentialusers = potentialusers.Limit(10).fetch()
+          'profile.name': new RegExp(template.find('#name').value) }, {limit: 10}).fetch()
         console.log potentialusers
         Session.set('people',potentialusers)
      Template.peoplelist.friends = () ->
