@@ -119,7 +119,7 @@ if Meteor.isServer
     console.log 'onCreateUser', options, user
     if user.services?.password?
       profile = options.profile || {}
-      profile.name = user.username
+      profile.fullName = user.username
     if user.services?.google?.accessToken?
       profile = getProfile user
       console.log 'extend', profile, options.profile
