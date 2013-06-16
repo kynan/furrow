@@ -191,7 +191,7 @@ if Meteor.isServer
     return user
   # Publish the services and createdAt fields from the users collection to the client
   Meteor.publish null, ->
-    Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1, profile: 1}}
+    Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1, profile: 1, name: 1, image: 1, url: 1}}
   Meteor.publish "connection_requests", ->
     ConnectionRequests.find {$or: [{userId: @userId}, {'requester._id': @userId}]}
   Meteor.publish "mood", (users)->
