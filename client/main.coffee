@@ -68,6 +68,8 @@ Meteor.startup ->
   Deps.autorun (c) ->
     user = Meteor.user()
     if Meteor.user()
+      Session.set 'friendslist', null
+      Session.set 'contactlist', null
       if user.services?.google?.accessToken?
         getGoogleContactList user.services.google.accessToken
       if user.services?.facebook?.accessToken?
