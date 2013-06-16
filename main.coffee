@@ -124,8 +124,10 @@ if Meteor.isClient
         evt.preventDefault()
         potentialusers = Meteor.users.find({
           'profile.name': new RegExp(template.find('#name').value) }, {limit: 10}).fetch()
+        console.log potentialusers
         me = Meteor.user()
-        potentialusers.filter (user) -> user != me
+        console.log me
+        potentialusers = potentialusers.filter (user) -> user._id != me._id
         console.log potentialusers
         Session.set('people',potentialusers)
      Template.peoplelist.friends = () ->
