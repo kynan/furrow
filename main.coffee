@@ -127,16 +127,10 @@ if Meteor.isClient
           'profile.name': new RegExp(template.find('#name').value) })
         potentialusers = potentialusers.fetch()
         console.log potentialusers
-        element = template.find('#results')
-        oldchild = element.lastChild
-        if (oldchild?)
-          element.removeChild(element.lastChild)
         Session.set('people',potentialusers) 
-        element.appendChild(Meteor.render( Template.peoplelist))
      Template.peoplelist.friends = () ->
        #very hacky, if people is undefined then we're probbably rendering
        #friends list
-      
        value = Session.get('people') if Meteor.Router.page() == 'invitefriends'
        value = Session.get("contactlist") if Meteor.Router.page() == 'friendslist' 
        console.log value
