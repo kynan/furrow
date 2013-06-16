@@ -127,7 +127,7 @@ if Meteor.isServer
       return res.data
     else
       Meteor._debug res.data
-      throw res.data
+      Meteor.Error res.statusCode, 'Failed to get Google profile', res.data
   getFacebookProfile = (user) ->
     url = 'https://graph.facebook.com/me'
     res = Meteor.http.get "#{url}?access_token=#{user.services.facebook.accessToken}"
@@ -143,7 +143,7 @@ if Meteor.isServer
       return res.data
     else
       Meteor._debug res.data
-      throw res.data
+      Meteor.Error res.statusCode, 'Failed to get Facebook profile', res.data
   Accounts.onCreateUser (options, user) ->
     # FIXME: eventually we want to make sure to consolidate profiles with the
     # same email address
