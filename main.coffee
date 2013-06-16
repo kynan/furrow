@@ -125,7 +125,7 @@ if Meteor.isClient
         console.log template.find('#name')
         potentialusers = Meteor.users.find({
           'profile.name': new RegExp(template.find('#name').value) })
-        potentialusers = potentialusers.limit(10).fetch()
+        potentialusers = potentialusers.Limit(10).fetch()
         console.log potentialusers
         Session.set('people',potentialusers) 
      Template.peoplelist.friends = () ->
