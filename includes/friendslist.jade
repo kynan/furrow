@@ -7,10 +7,6 @@ template(name="friendslist")
         a.mood(href='/mood')
           span.icon.icon-menu Mood
       h1 Furrow: your friends
-    {{#if friends}}
-    article#friends(data-type="list")
-      header Connect to your friends:
-      {{> peoplelist}}
-    {{/if}}
+    {{> peoplelist}}
     aside
       a(href="/invitefriends") invite an existing friend

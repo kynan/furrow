@@ -42,7 +42,11 @@ if Meteor.isClient
         for contact in contacts
           user = Meteor.users.findOne 'services.facebook.id': contact.id
           contactStatus user, contact if user
+          contact.url = "https://facebook.com/#{contact.id}"
+          contact.image =
+            url: "http://graph.facebook.com/#{contact.id}/picture"
         Session.set("contactlist", contacts)
+        console.log 'Facebook contacts', contacts
         return Session.set("friendslist", (c for c in contacts when c.is_friend))
       if err.response.statusCode == 401 or err.response.statusCode == 403
         Meteor.Error err.response.statusCode, 'Failed to get Google contacts list', err.response
@@ -132,9 +136,7 @@ if Meteor.isClient
         element.appendChild(Meteor.render( Template.peoplelist))
         people = null
      Template.peoplelist.friends = () ->
-       #very hacky, if people is undefined then we're probbably rendering
-       #friends list
-       people || Session.get("contactlist")
+       Session.get("contactlist")
 
 if Meteor.isServer
   getGoogleProfile = (user) ->
