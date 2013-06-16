@@ -9,22 +9,6 @@ if Meteor.isClient
     requestOfflineToken:
       google: true
     passwordSignupFields: 'USERNAME_AND_EMAIL'
-  getProfile = (token) ->
-    url = 'https://www.googleapis.com/plus/v1/people/me'
-    Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
-      Meteor._debug err if err?
-      console.log res
-      me = Meteor.user()
-      profile = me.profile
-      profile._id = me._id
-      # The google profile has a name attribute with a nested hash of
-      # {familyName: ..., givenName: ...}, so we need to rename that, since
-      # it's being used in the Metor displayName template helper
-      res.data.fullName = res.data.name
-      delete res.data.name
-      # Update the user's profile with their google profile
-      _.extend profile, res.data
-      Meteor.users.update me._id, {$set: {profile: profile}}
   getFriendsList = (token) ->
     url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
     Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
@@ -72,12 +56,6 @@ if Meteor.isClient
         console.log user
         if user.services?.google?.accessToken?
           getFriendsList user.services.google.accessToken
-          getProfile user.services.google.accessToken
-        if user.username?
-          #normalise name to fullName which is used by google
-          #this if is needed as users.update triggers deps.autorun
-          if !user.fullName? || user.fullName != user.username
-            Meteor.users.update(user._id,{$set: {fullName: user.username}})
         Meteor.subscribe "connection_requests"
         if user.friends
           Meteor.subscribe "mood", user.friends
@@ -123,6 +101,31 @@ if Meteor.isClient
       Session.get "moods"
 
 if Meteor.isServer
+  getProfile = (user) ->
+    url = 'https://www.googleapis.com/plus/v1/people/me'
+    res = Meteor.http.get "#{url}?access_token=#{user.services.google.accessToken}"
+    if res.statusCode == 200
+      console.log res
+      # The google profile has a name attribute with a nested hash of
+      # {familyName: ..., givenName: ...}, so we need to rename that, since
+      # it's being used in the Metor displayName template helper
+      res.data.fullName = res.data.name
+      delete res.data.name
+      return res.data
+    else
+      Meteor._debug res.data
+      throw res.data
+  Accounts.onCreateUser (options, user) ->
+    console.log 'onCreateUser', options, user
+    if user.services?.password?
+      profile = options.profile || {}
+      profile.name = user.username
+    if user.services?.google?.accessToken?
+      profile = getProfile user
+      console.log 'extend', profile, options.profile
+      _.extend profile, options.profile
+    user.profile = profile
+    return user
   # Publish the services and createdAt fields from the users collection to the client
   Meteor.publish null, ->
     Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1, profile: 1}}
