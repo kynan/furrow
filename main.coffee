@@ -5,7 +5,7 @@ if Meteor.isClient
   Accounts.ui.config
     requestPermissions:
       google: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email']
-      facebook: ['read_friendlists', 'read_stream', 'user_photos', 'user_relationships', 'user_status']
+      facebook: ['email', 'read_friendlists', 'read_stream', 'user_photos', 'user_relationships', 'user_status']
     requestOfflineToken:
       google: true
     passwordSignupFields: 'USERNAME_AND_EMAIL'
@@ -120,11 +120,11 @@ if Meteor.isClient
        people || Session.get("contactlist")
 
 if Meteor.isServer
-  getProfile = (user) ->
+  getGoogleProfile = (user) ->
     url = 'https://www.googleapis.com/plus/v1/people/me'
     res = Meteor.http.get "#{url}?access_token=#{user.services.google.accessToken}"
     if res.statusCode == 200
-      console.log res
+      console.log 'Google profile', res
       # The google profile has a name attribute with a nested hash of
       # {familyName: ..., givenName: ...}, so we need to rename that, since
       # it's being used in the Metor displayName template helper
@@ -133,16 +133,35 @@ if Meteor.isServer
       return res.data
     else
       Meteor._debug res.data
-      throw res.data
+      Meteor.Error res.statusCode, 'Failed to get Google profile', res.data
+  getFacebookProfile = (user) ->
+    url = 'https://graph.facebook.com/me'
+    res = Meteor.http.get "#{url}?access_token=#{user.services.facebook.accessToken}"
+    if res.statusCode == 200
+      console.log 'Facebook profile', res
+      # The google profile has a name attribute with a nested hash of
+      # {familyName: ..., givenName: ...}, so we need to rename that, since
+      # it's being used in the Metor displayName template helper
+      res.data.fullName = res.data.name
+      res.data.image =
+        url: "http://graph.facebook.com/#{res.data.id}/picture?type=large"
+      delete res.data.name
+      return res.data
+    else
+      Meteor._debug res.data
+      Meteor.Error res.statusCode, 'Failed to get Facebook profile', res.data
   Accounts.onCreateUser (options, user) ->
+    # FIXME: eventually we want to make sure to consolidate profiles with the
+    # same email address
     console.log 'onCreateUser', options, user
+    profile = options.profile || {}
     if user.services?.password?
       profile = options.profile || {}
       profile.name = user.username
     if user.services?.google?.accessToken?
-      profile = getProfile user
-      console.log 'extend', profile, options.profile
-      _.extend profile, options.profile
+      _.extend profile, getGoogleProfile user
+    if user.services?.facebook?.accessToken?
+      _.extend profile, getFacebookProfile user
     user.profile = profile
     console.log 'onCreateUser end', options, user
     return user
