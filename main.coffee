@@ -92,9 +92,11 @@ if Meteor.isClient
     Template.peoplelist.events =
       'click button.connect': (evt, template) ->
         console.log evt, template
+        requester = Meteor.user().profile
+        requester._id = Meteor.userId()
         ConnectionRequests.insert
           userId: evt.target.id
-          requester: Meteor.user().profile
+          requester: requester
       'click button.unfriend': (evt, template) ->
         console.log 'unfriend', evt, template
         Meteor.users.update _id: Meteor.userId(), {$pull: {friends: evt.target.id}}
@@ -131,7 +133,7 @@ if Meteor.isClient
          value = Session.get('people')
        else
          value = Session.get("contactlist")
-       console.log value 
+       console.log value
        return value
 
 if Meteor.isServer
