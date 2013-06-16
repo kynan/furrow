@@ -107,9 +107,11 @@ if Meteor.isClient
         console.log potentialusers
         Template.invitefriends.friends = () ->
           Session.get('people')
-        console.log(template.find('#results'))
-        console.log(Meteor.render(Template.peoplelist))
-        template.find('#results').appendChild(Meteor.render(Template.peoplelist))
+        element = template.find('#results')
+        oldchild = element.lastChild
+        if (oldchild?)
+          element.removeChild(element.lastChild)
+        element.appendChild(Meteor.render(Template.peoplelist))
 
 if Meteor.isServer
   getProfile = (user) ->
