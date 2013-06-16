@@ -123,6 +123,8 @@ if Meteor.isClient
         evt.preventDefault()
         potentialusers = Meteor.users.find({
           'profile.name': new RegExp(template.find('#name').value) }, {limit: 10}).fetch()
+        me = Meteor.user()
+        potentialusers.filter (user) -> user != me
         console.log potentialusers
         Session.set('people',potentialusers)
      Template.peoplelist.friends = () ->
@@ -130,7 +132,7 @@ if Meteor.isClient
          value = Session.get('people')
        else
          value = Session.get("contactlist")
-       console.log value
+       console.log value 
        return value
 
 if Meteor.isServer
@@ -172,6 +174,7 @@ if Meteor.isServer
     if user.services?.password?
       profile = options.profile || {}
       profile.name = user.username
+      user.name = user.username
     if user.services?.google?.accessToken?
       _.extend profile, getGoogleProfile user
     if user.services?.facebook?.accessToken?
