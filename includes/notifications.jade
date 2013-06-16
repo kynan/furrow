@@ -5,7 +5,7 @@ template(name="notifications")
       section(role="status")
         p
           img(src="{{requester.image.url}}")
-          strong {{requester.displayName}}
+          strong {{requester.name}}
           span would like to see your status
           {{#if requester._id}}
           button.accept(id="{{requester._id}}", requestId="{{_id}}") accept

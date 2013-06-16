@@ -16,7 +16,7 @@ template(name="mood")
           aside.pack-end
             img(src="{{image.url}}")
           a(href="{{url}}")
-            p {{displayName}}
+            p {{name}}
             p is feeling {{mood.mood}}: {{mood.message}} ({{mood.modified}})
         {{/each}}
     {{/if}}
