@@ -158,6 +158,7 @@ if Meteor.isServer
       # {familyName: ..., givenName: ...}, so we need to rename that, since
       # it's being used in the Metor displayName template helper
       res.data.fullName = res.data.name
+      res.data.url = res.data.link
       res.data.image =
         url: "http://graph.facebook.com/#{res.data.id}/picture?type=large"
       delete res.data.name
@@ -179,6 +180,9 @@ if Meteor.isServer
     if user.services?.facebook?.accessToken?
       _.extend profile, getFacebookProfile user
     user.profile = profile
+    user.name = profile.name
+    user.url = profile.url || ''
+    user.image = profile.image || url: 'http://b.static.ak.fbcdn.net/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif'
     console.log 'onCreateUser end', options, user
     return user
   # Publish the services and createdAt fields from the users collection to the client
