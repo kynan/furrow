@@ -99,6 +99,17 @@ if Meteor.isClient
         Meteor.Router.to '/mood'
     Template.mood.moods = () ->
       Session.get "moods"
+    Template.invitefriends.events =
+      'click button.search': (evt, template) ->
+        evt.preventDefault()
+        evt.stopPropagation()
+        potentialusers = Meteor.users.find({fullName: template.name})
+        console.log potentialusers
+        Template.invitefriends.friends = () ->
+          Session.get('people')
+        console.log(template.find('#results'))
+        console.log(Meteor.render(Template.peoplelist))
+        template.find('#results').appendChild(Meteor.render(Template.peoplelist))
 
 if Meteor.isServer
   getProfile = (user) ->
