@@ -93,6 +93,14 @@ Meteor.startup ->
       ConnectionRequests.insert
         userId: evt.target.id
         requester: requester
+      #contactlist is not always defined for users 
+      #who have not imported contacts
+      contacts = Session.get("contactlist") || [] 
+      contactids = (contact._id for contact in contacts)
+      if !(evt.target.id in contactids)
+        contact = Meteor.users.findOne '_id': evt.target.id
+        contacts.push contact
+        Session.set("contactlist", contacts)
     'click button.unfriend': (evt, template) ->
       console.log 'unfriend', evt, template
       Meteor.users.update _id: Meteor.userId(), {$pull: {friends: evt.target.id}}
