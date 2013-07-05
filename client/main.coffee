@@ -11,6 +11,7 @@ contactStatus = (user, contact) ->
   contact.is_friend = user._id in me.friends if me.friends
   contact.is_following = me._id in user.friends if user.friends
   contact.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
+  return contact
 getGoogleContactList = (token) ->
   url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
   Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
@@ -57,8 +58,8 @@ setContactsFromFriends = (friends) ->
     if !(friend in contactids)
       changed = true
       user = Meteor.users.findOne(_id: friend)
-      contact = {}
-      contactStatus user, contact
+      contact = user
+      contact = contactStatus user, contact
       contacts.push contact
       
   #needed to prevent an infinite loop where session.set triggers this method
