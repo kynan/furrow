@@ -47,6 +47,20 @@ getFacebookContactList = (token) ->
     if err.response.statusCode == 401 or err.response.statusCode == 403
       Meteor.Error err.response.statusCode, 'Failed to get Google contacts list', err.response
 
+# FIXME: This should really be a method on the server
+setContactsFromFriends = (friends) ->
+  #user may not have a contactlist if they are using a password account
+  contacts = Session.get("contactlist") || []
+  contactids = (x._id for x in contacts)
+  changed = false
+  for friend in friends
+    if !(friend in contactids)
+      changed = true
+      contacts.push Meteor.users.findOne(_id: friend)
+  #needed to prevent an infinite loop where session.set triggers this method
+  if changed
+    Session.set("contactlist",contacts) 
+
 Meteor.Router.filters
   requireLogin: (page) ->
     if Meteor.user()
@@ -85,6 +99,7 @@ Meteor.startup ->
         moods = (getMood friend for friend in Meteor.user().friends)
         console.log 'moods', moods
         Session.set "moods", moods
+        setContactsFromFriends user.friends
   Template.peoplelist.events =
     'click button.connect': (evt, template) ->
       console.log 'connect', evt, template
@@ -126,6 +141,7 @@ Meteor.startup ->
   Template.invitefriends.events =
     'click button.search': (evt, template) ->
       evt.preventDefault()
+      # FIXME: This should really be a method on the server
       potentialusers = Meteor.users.find({
         'profile.name': new RegExp(template.find('#name').value) }, {limit: 10}).fetch()
       me = Meteor.user()
