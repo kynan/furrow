@@ -56,7 +56,11 @@ setContactsFromFriends = (friends) ->
   for friend in friends
     if !(friend in contactids)
       changed = true
-      contacts.push Meteor.users.findOne(_id: friend)
+      user = Meteor.users.findOne(_id: friend)
+      contact = {}
+      contactStatus user, contact
+      contacts.push contact
+      
   #needed to prevent an infinite loop where session.set triggers this method
   if changed
     Session.set("contactlist",contacts) 
@@ -87,6 +91,7 @@ Meteor.startup ->
       if user.services?.facebook?.accessToken?
         getFacebookContactList user.services.facebook.accessToken
       Meteor.subscribe "connection_requests"
+      Meteor.subscribe "connection_responses"
       if user.friends
         Meteor.subscribe "mood", user.friends
         getMood = (friend) ->
