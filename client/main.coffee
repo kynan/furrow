@@ -18,11 +18,17 @@ getGoogleContactList = (token) ->
     Meteor._debug err if err?
     if !err?
       contacts = res.data.items
+      oldcontacts = Session.get("contactlist") || []
+      oldcontactids = (x._id for x in oldcontacts)
       # Check whether any of your contacts is already registered
       for contact in contacts
         user = Meteor.users.findOne 'services.google.id': contact.id
-        contactStatus user, contact if user
-      Session.set("contactlist", contacts)
+        if !(user._id in contactids) #not already present from some other source
+          changed = true
+          contactStatus user, contact if user
+          contacts.push contact
+      if changed
+        Session.set("contactlist", contacts)
       console.log 'Google contacts', contacts
       return Session.set("friendslist", (c for c in contacts when c.is_friend))
     # Log out if auth token has expired; should no longer be necessary once
@@ -35,14 +41,21 @@ getFacebookContactList = (token) ->
     Meteor._debug err if err?
     if !err?
       contacts = res.data.data
+      Session.set("contactlist", contacts)
+      oldcontacts = Session.get("contactlist") || []
+      oldcontactids = (x._id for x in oldcontacts)
       # Check whether any of your contacts is already registered
       for contact in contacts
         user = Meteor.users.findOne 'services.facebook.id': contact.id
-        contactStatus user, contact if user
-        contact.url = "https://facebook.com/#{contact.id}"
-        contact.image =
+        if !(user._id in contactids) #not already present from some other source
+          changed = true
+          contactStatus user, contact if user
+          contact.url = "https://facebook.com/#{contact.id}"
+          contact.image =
           url: "http://graph.facebook.com/#{contact.id}/picture"
-      Session.set("contactlist", contacts)
+          contacts.push contact
+      if changed
+        Session.set("contactlist", contacts)
       console.log 'Facebook contacts', contacts
       return Session.set("friendslist", (c for c in contacts when c.is_friend))
     if err.response.statusCode == 401 or err.response.statusCode == 403
@@ -61,7 +74,6 @@ setContactsFromFriends = (friends) ->
       contact = user
       contact = contactStatus user, contact
       contacts.push contact
-      
   #needed to prevent an infinite loop where session.set triggers this method
   if changed
     Session.set("contactlist",contacts) 
@@ -87,8 +99,9 @@ Meteor.startup ->
   Deps.autorun (c) ->
     user = Meteor.user()
     if Meteor.user()
-      Session.set 'friendslist', null
-      Session.set 'contactlist', null
+      #These should not be needed with inteligent merging 
+      #Session.set 'friendslist', null
+      #Session.set 'contactlist', null
       if user.services?.google?.accessToken?
         getGoogleContactList user.services.google.accessToken
       if user.services?.facebook?.accessToken?
@@ -122,11 +135,16 @@ Meteor.startup ->
       contactids = (contact._id for contact in contacts)
       if !(evt.target.id in contactids)
         contact = Meteor.users.findOne '_id': evt.target.id
+        contact = contactStatus contact, contact
         contacts.push contact
         Session.set("contactlist", contacts)
     'click button.unfriend': (evt, template) ->
       console.log 'unfriend', evt, template
       Meteor.users.update _id: Meteor.userId(), {$pull: {friends: evt.target.id}}
+      #force update of status for contact removed
+      contacts = Session.get("contactlist")
+      contacts = (contactStatus contact, contact for contact in contacts when contact._id == evt.target.id)
+      Session.set("contactlist")
   Template.notifications.connectionRequests = () ->
     ConnectionRequests.find userId: Meteor.userId()
   Template.notifications.events =
