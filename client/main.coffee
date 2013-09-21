@@ -23,7 +23,7 @@ getGoogleContactList = (token) ->
       # Check whether any of your contacts is already registered
       for contact in contacts
         user = Meteor.users.findOne 'services.google.id': contact.id
-        if !(user._id in contactids) #not already present from some other source
+        if !(user?._id in oldcontactids) #not already present from some other source
           changed = true
           contactStatus user, contact if user
           contacts.push contact
@@ -47,7 +47,7 @@ getFacebookContactList = (token) ->
       # Check whether any of your contacts is already registered
       for contact in contacts
         user = Meteor.users.findOne 'services.facebook.id': contact.id
-        if !(user._id in contactids) #not already present from some other source
+        if !(user?._id in oldcontactids) #not already present from some other source
           changed = true
           contactStatus user, contact if user
           contact.url = "https://facebook.com/#{contact.id}"
@@ -65,10 +65,9 @@ getFacebookContactList = (token) ->
 setContactsFromFriends = (friends) ->
   #user may not have a contactlist if they are using a password account
   contacts = Session.get("contactlist") || []
-  contactids = (x._id for x in contacts)
   changed = false
   for friend in friends
-    if !(friend in contactids)
+    if !(friend in (contact._id for contact in contacts))
       changed = true
       user = Meteor.users.findOne(_id: friend)
       contact = user
@@ -132,8 +131,7 @@ Meteor.startup ->
       #contactlist is not always defined for users 
       #who have not imported contacts
       contacts = Session.get("contactlist") || [] 
-      contactids = (contact._id for contact in contacts)
-      if !(evt.target.id in contactids)
+      if !(evt.target.id in (contact._id for contact in contacts))
         contact = Meteor.users.findOne '_id': evt.target.id
         contact = contactStatus contact, contact
         contacts.push contact
