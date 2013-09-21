@@ -5,30 +5,29 @@ Accounts.ui.config
   requestOfflineToken:
     google: true
   passwordSignupFields: 'USERNAME_AND_EMAIL'
-contactStatus = (user, contact, attrs) ->
+contactStatus = (user, contact) ->
   me = Meteor.user()
   contact._id = user._id
   contact.is_friend = user._id in me.friends if me.friends
   contact.is_following = me._id in user.friends if user.friends
   contact.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
-  _.extend attrs if attrs
   return contact
 getGoogleContactList = (token) ->
   url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
   Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
     Meteor._debug err if err?
     if !err?
-      contacts = res.data.items
-      oldcontacts = Session.get("contactlist") || []
-      oldcontactids = (x._id for x in oldcontacts)
+      contacts = Session.get("contactlist") || []
+      contactids = (x.google_id for x in contacts)
       # Check whether any of your contacts is already registered
-      for contact in contacts
-        user = Meteor.users.findOne 'services.google.id': contact.id
-        if !(user?._id in oldcontactids) #not already present from some other source
-          changed = true
-          contacts.push contactStatus user, contact if user
-      if changed
-        Session.set("contactlist", contacts)
+      for contact in res.data.items
+        if !(contact.id in contactids)
+          user = Meteor.users.findOne 'services.google.id': contact.id
+          contact = contactStatus user, contact if user
+          contact.google_id = contact.id
+          contact.name = contact.displayName
+          contacts.push contact
+      Session.set("contactlist", contacts)
       console.log 'Google contacts', contacts
       return Session.set("friendslist", (c for c in contacts when c.is_friend))
     # Log out if auth token has expired; should no longer be necessary once
@@ -40,21 +39,19 @@ getFacebookContactList = (token) ->
   Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
     Meteor._debug err if err?
     if !err?
-      contacts = res.data.data
-      Session.set("contactlist", contacts)
-      oldcontacts = Session.get("contactlist") || []
-      oldcontactids = (x._id for x in oldcontacts)
+      contacts = Session.get("contactlist") || []
+      contactids = (x.facebook_id for x in contacts)
       # Check whether any of your contacts is already registered
-      for contact in contacts
-        user = Meteor.users.findOne 'services.facebook.id': contact.id
-        if !(user?._id in oldcontactids) #not already present from some other source
-          changed = true
-          contacts.push contactStatus user, contact, 
-            url: "https://facebook.com/#{contact.id}"
-            image:
-              url: "http://graph.facebook.com/#{contact.id}/picture"
-      if changed
-        Session.set("contactlist", contacts)
+      for contact in res.data.data
+        if !(contact.id in contactids)
+          user = Meteor.users.findOne 'services.facebook.id': contact.id
+          contact = contactStatus user, contact if user
+          contact.facebook_id = contact.id
+          contact.url = "https://facebook.com/#{contact.id}"
+          contact.image =
+            url: "http://graph.facebook.com/#{contact.id}/picture"
+          contacts.push contact
+      Session.set("contactlist", contacts)
       console.log 'Facebook contacts', contacts
       return Session.set("friendslist", (c for c in contacts when c.is_friend))
     if err.response.statusCode == 401 or err.response.statusCode == 403
@@ -96,7 +93,7 @@ Meteor.Router.add
 Meteor.startup ->
   Deps.autorun (c) ->
     user = Meteor.user()
-    if Meteor.user()
+    if user
       if user.services?.google?.accessToken?
         getGoogleContactList user.services.google.accessToken
       if user.services?.facebook?.accessToken?
