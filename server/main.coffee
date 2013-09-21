@@ -1,6 +1,6 @@
 getGoogleProfile = (user) ->
   url = 'https://www.googleapis.com/plus/v1/people/me'
-  res = Meteor.http.get "#{url}?access_token=#{user.services.google.accessToken}"
+  res = HTTP.get "#{url}?access_token=#{user.services.google.accessToken}"
   if res.statusCode == 200
     console.log 'Google profile', res
     # The google profile has a name attribute with a nested hash of
@@ -14,7 +14,7 @@ getGoogleProfile = (user) ->
     Meteor.Error res.statusCode, 'Failed to get Google profile', res.data
 getFacebookProfile = (user) ->
   url = 'https://graph.facebook.com/me'
-  res = Meteor.http.get "#{url}?access_token=#{user.services.facebook.accessToken}"
+  res = HTTP.get "#{url}?access_token=#{user.services.facebook.accessToken}"
   if res.statusCode == 200
     console.log 'Facebook profile', res
     # The google profile has a name attribute with a nested hash of
