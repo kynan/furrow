@@ -11,4 +11,9 @@ accounts-facebook
 accounts-google
 accounts-password
 accounts-ui
-
+standard-app-packages
+http
+jade-handlebars
+router
+HTML5-History-API
+page-js-ie-support
