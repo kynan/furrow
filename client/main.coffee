@@ -93,7 +93,7 @@ Meteor.Router.add
 Meteor.startup ->
   Deps.autorun (c) ->
     user = Meteor.user()
-    if user
+    if user and not Session.get 'contactlist'
       if user.services?.google?.accessToken?
         getGoogleContactList user.services.google.accessToken
       if user.services?.facebook?.accessToken?
@@ -113,7 +113,7 @@ Meteor.startup ->
         console.log 'moods', moods
         Session.set "moods", moods
         setContactsFromFriends user.friends
-    else
+    else if not user
       Session.set "moods", undefined
       Session.set "friendslist", undefined
       Session.set "contactlist", undefined
