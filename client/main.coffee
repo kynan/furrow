@@ -171,8 +171,8 @@ Meteor.startup ->
       me = Meteor.user()
       potentialusers = potentialusers.filter (user) -> user._id != me._id
       Session.set('people',potentialusers)
-   Template.peoplelist.friends = () ->
-     if Meteor.Router.page() == 'invitefriends'
-       return Session.get('people')
-     else
-       return Session.get("contactlist")
+  Template.peoplelist.friends = () ->
+    if Meteor.Router.page() == 'invitefriends'
+      return Session.get('people')
+    else
+      return Session.get("contactlist")
