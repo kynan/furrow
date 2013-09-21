@@ -5,12 +5,13 @@ Accounts.ui.config
   requestOfflineToken:
     google: true
   passwordSignupFields: 'USERNAME_AND_EMAIL'
-contactStatus = (user, contact) ->
+contactStatus = (user, contact, attrs) ->
   me = Meteor.user()
   contact._id = user._id
   contact.is_friend = user._id in me.friends if me.friends
   contact.is_following = me._id in user.friends if user.friends
   contact.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
+  _.extend attrs if attrs
   return contact
 getGoogleContactList = (token) ->
   url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
@@ -25,8 +26,7 @@ getGoogleContactList = (token) ->
         user = Meteor.users.findOne 'services.google.id': contact.id
         if !(user?._id in oldcontactids) #not already present from some other source
           changed = true
-          contactStatus user, contact if user
-          contacts.push contact
+          contacts.push contactStatus user, contact if user
       if changed
         Session.set("contactlist", contacts)
       console.log 'Google contacts', contacts
@@ -49,11 +49,10 @@ getFacebookContactList = (token) ->
         user = Meteor.users.findOne 'services.facebook.id': contact.id
         if !(user?._id in oldcontactids) #not already present from some other source
           changed = true
-          contactStatus user, contact if user
-          contact.url = "https://facebook.com/#{contact.id}"
-          contact.image =
-          url: "http://graph.facebook.com/#{contact.id}/picture"
-          contacts.push contact
+          contacts.push contactStatus user, contact, 
+            url: "https://facebook.com/#{contact.id}"
+            image:
+              url: "http://graph.facebook.com/#{contact.id}/picture"
       if changed
         Session.set("contactlist", contacts)
       console.log 'Facebook contacts', contacts
