@@ -48,6 +48,26 @@ Accounts.onCreateUser (options, user) ->
   user.image = profile.image || url: 'http://b.static.ak.fbcdn.net/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif'
   console.log 'onCreateUser end', options, user
   return user
+Meteor.methods
+  refreshOAuthToken: (service) ->
+    getNewAccessToken = (service) ->
+      result = Meteor.http.post(service.url, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}, content: oAuthRefreshBody(service)})
+      return result.data?.access_token
+    oAuthRefreshBody = (service) ->
+      loginServiceConfig = Accounts.loginServiceConfiguration.findOne({service: service.name});
+      return 'refresh_token=' + Meteor.user().services[service.name].refreshToken +
+          '&client_id=' + loginServiceConfig.clientId +
+          '&client_secret=' + loginServiceConfig.secret +
+          '&grant_type=refresh_token'
+    storeNewAccessToken = (service, newAccessToken) ->
+      o = {}
+      o['services.' + service.name + '.accessToken'] = newAccessToken
+      Meteor.users.update Meteor.userId(), {$set: o}
+    token = getNewAccessToken service
+    console.log "Got new access token #{token} for", service
+    storeNewAccessToken service, token
+    return token
+
 # Publish the services and createdAt fields from the users collection to the client
 Meteor.publish null, ->
   Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1, profile: 1, name: 1, image: 1, url: 1}}

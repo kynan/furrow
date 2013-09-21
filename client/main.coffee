@@ -30,10 +30,18 @@ getGoogleContactList = (token) ->
       Session.set("contactlist", contacts)
       console.log 'Google contacts', contacts
       return Session.set("friendslist", (c for c in contacts when c.is_friend))
-    # Log out if auth token has expired; should no longer be necessary once
-    # https://github.com/meteor/meteor/pull/522 is merged
-    if err.response.statusCode == 401 or err.response.statusCode == 403
+    report = (err) ->
       Meteor.Error err.response.statusCode, 'Failed to get Google contacts list', err.response
+    if err.response.statusCode == 401
+      # Refresh OAuth token if it has expired. Simplified version of
+      # https://github.com/meteor/meteor/pull/522
+      Meteor.call 'refreshOAuthToken',
+        {name: 'google', url: 'https://accounts.google.com/o/oauth2/token'},
+        (err, token) ->
+          getGoogleContactList token if !err
+          report err if err
+    else
+      report err
 getFacebookContactList = (token) ->
   url = 'https://graph.facebook.com/me/friends'
   Meteor.http.get "#{url}?access_token=#{token}", (err, res) ->
