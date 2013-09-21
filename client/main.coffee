@@ -97,9 +97,6 @@ Meteor.startup ->
   Deps.autorun (c) ->
     user = Meteor.user()
     if Meteor.user()
-      #These should not be needed with inteligent merging 
-      #Session.set 'friendslist', null
-      #Session.set 'contactlist', null
       if user.services?.google?.accessToken?
         getGoogleContactList user.services.google.accessToken
       if user.services?.facebook?.accessToken?
@@ -119,6 +116,10 @@ Meteor.startup ->
         console.log 'moods', moods
         Session.set "moods", moods
         setContactsFromFriends user.friends
+    else
+      Session.set "moods", undefined
+      Session.set "friendslist", undefined
+      Session.set "contactlist", undefined
   Template.peoplelist.events =
     'click button.connect': (evt, template) ->
       console.log 'connect', evt, template
