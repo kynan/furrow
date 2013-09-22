@@ -165,19 +165,19 @@ Deps.autorun (c) ->
       getGoogleContactList user.services.google.accessToken
     if user.services?.facebook?.accessToken?
       getFacebookContactList user.services.facebook.accessToken
-    if user.friends
-      Meteor.subscribe "mood", user.friends
-      getMood = (friend) ->
-        # FIXME: This should really be a method on the server
-        profile = Meteor.users.findOne(_id: friend).profile
-        profile.mood = Mood.findOne {userId: friend}, {sort: {createdAt: -1}}
-        if profile.mood?.createdAt?
-          profile.mood.modified = humanized_time_span profile.mood.createdAt
-        return profile
-      moods = (getMood friend for friend in Meteor.user().friends)
-      console.log 'moods', moods
-      Session.set "moods", moods
-      setContactsFromFriends user.friends
+  else if user?.friends
+    Meteor.subscribe "mood", user.friends
+    getMood = (friend) ->
+      # FIXME: This should really be a method on the server
+      profile = Meteor.users.findOne(_id: friend).profile
+      profile.mood = Mood.findOne {userId: friend}, {sort: {createdAt: -1}}
+      if profile.mood?.createdAt?
+        profile.mood.modified = humanized_time_span profile.mood.createdAt
+      return profile
+    moods = (getMood friend for friend in Meteor.user().friends)
+    console.log 'moods', moods
+    Session.set "moods", moods
+    setContactsFromFriends user.friends
   else if not user
     Session.set "moods", undefined
     Session.set "friendslist", undefined
