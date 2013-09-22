@@ -1,8 +1,8 @@
 {
   "packages": {
     "jade-handlebars": {
-      "git": "git://github.com/terro/meteor-jade-handlebars.git",
-      "branch": "master"
+      "git": "git://github.com/kynan/meteor-jade-handlebars.git",
+      "branch": "refactor-for-meteor-0.6.5"
     },
     "router": {}
   }

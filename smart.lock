@@ -3,16 +3,16 @@
   "dependencies": {
     "basePackages": {
       "jade-handlebars": {
-        "git": "git://github.com/terro/meteor-jade-handlebars.git",
-        "branch": "master"
+        "git": "git://github.com/kynan/meteor-jade-handlebars.git",
+        "branch": "refactor-for-meteor-0.6.5"
       },
       "router": {}
     },
     "packages": {
       "jade-handlebars": {
-        "git": "git://github.com/terro/meteor-jade-handlebars.git",
-        "branch": "master",
-        "commit": "9357f6546485a5cf311da13bf4b31ff25af5752e"
+        "git": "git://github.com/kynan/meteor-jade-handlebars.git",
+        "branch": "refactor-for-meteor-0.6.5",
+        "commit": "e4f6ea749bd9f88af803df97ced479891acc9009"
       },
       "router": {
         "git": "https://github.com/tmeasday/meteor-router.git",
