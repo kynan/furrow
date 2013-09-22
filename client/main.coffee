@@ -1,3 +1,6 @@
+Meteor.subscribe "connection_requests"
+Meteor.subscribe "connection_responses"
+
 Accounts.ui.config
   requestPermissions:
     google: ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/userinfo.email']
@@ -162,8 +165,6 @@ Deps.autorun (c) ->
       getGoogleContactList user.services.google.accessToken
     if user.services?.facebook?.accessToken?
       getFacebookContactList user.services.facebook.accessToken
-    Meteor.subscribe "connection_requests"
-    Meteor.subscribe "connection_responses"
     if user.friends
       Meteor.subscribe "mood", user.friends
       getMood = (friend) ->
