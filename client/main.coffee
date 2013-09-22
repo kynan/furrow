@@ -8,6 +8,7 @@ Accounts.ui.config
   requestOfflineToken:
     google: true
   passwordSignupFields: 'USERNAME_AND_EMAIL'
+
 contactStatus = (user, contact) ->
   me = Meteor.user()
   contact._id = user._id
@@ -15,6 +16,7 @@ contactStatus = (user, contact) ->
   contact.is_following = me._id in user.friends if user.friends
   contact.is_invited = ConnectionRequests.findOne {'requester._id': me._id, userId: user._id}
   return contact
+
 getGoogleContactList = (token) ->
   url = 'https://www.googleapis.com/plus/v1/people/me/people/visible'
   HTTP.get "#{url}?access_token=#{token}", (err, res) ->
@@ -45,6 +47,7 @@ getGoogleContactList = (token) ->
           report err if err
     else
       report err
+
 getFacebookContactList = (token) ->
   url = 'https://graph.facebook.com/me/friends'
   HTTP.get "#{url}?access_token=#{token}", (err, res) ->
@@ -124,13 +127,16 @@ Template.peoplelist.events
     contacts = Session.get("contactlist")
     contacts = (contactStatus contact, contact for contact in contacts when contact._id == evt.target.id)
     Session.set("contactlist")
+
 Template.notifications.connectionRequests = () ->
   ConnectionRequests.find userId: Meteor.userId()
+
 Template.notifications.events
   'click button.accept': (evt, template) ->
     console.log 'accept', evt, template
     Meteor.users.update _id: evt.target.id, {$addToSet: {friends: Meteor.userId()}}
     ConnectionRequests.remove evt.target.attributes.requestId.value
+
 Template.setmood.events
   'click a.submit': (evt, template) ->
     console.log 'set mood', evt, template
@@ -141,8 +147,10 @@ Template.setmood.events
       message: template.find("input#message").value
       createdAt: Date.now()
     Meteor.Router.to '/mood'
+
 Template.mood.moods = () ->
   Session.get "moods"
+
 Template.invitefriends.events
   'click button.search': (evt, template) ->
     evt.preventDefault()
@@ -152,6 +160,7 @@ Template.invitefriends.events
     me = Meteor.user()
     potentialusers = potentialusers.filter (user) -> user._id != me._id
     Session.set('people',potentialusers)
+
 Template.peoplelist.friends = () ->
   if Meteor.Router.page() == 'invitefriends'
     return Session.get('people')

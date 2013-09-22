@@ -12,6 +12,7 @@ getGoogleProfile = (user) ->
   else
     Meteor._debug res.data
     Meteor.Error res.statusCode, 'Failed to get Google profile', res.data
+
 getFacebookProfile = (user) ->
   url = 'https://graph.facebook.com/me'
   res = HTTP.get "#{url}?access_token=#{user.services.facebook.accessToken}"
@@ -29,6 +30,7 @@ getFacebookProfile = (user) ->
   else
     Meteor._debug res.data
     Meteor.Error res.statusCode, 'Failed to get Facebook profile', res.data
+
 Accounts.onCreateUser (options, user) ->
   # FIXME: eventually we want to make sure to consolidate profiles with the
   # same email address
@@ -48,6 +50,7 @@ Accounts.onCreateUser (options, user) ->
   user.image = profile.image || url: 'http://b.static.ak.fbcdn.net/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif'
   console.log 'onCreateUser end', options, user
   return user
+
 Meteor.methods
   refreshOAuthToken: (service) ->
     getNewAccessToken = (service) ->
@@ -71,11 +74,14 @@ Meteor.methods
 # Publish the services and createdAt fields from the users collection to the client
 Meteor.publish null, ->
   Meteor.users.find {}, {fields: {services: 1, createdAt: 1, friends: 1, profile: 1, name: 1, image: 1, url: 1}}
+
 Meteor.publish "connection_requests", ->
   ConnectionRequests.find {$or: [{userId: @userId}, {'requester._id': @userId}]}
+
 Meteor.publish "mood", (users)->
   check(users, Array)
   Mood.find userId: {$in: users}
+
 Meteor.users.allow
   update: (userId, doc) ->
     return userId == doc._id or ConnectionRequests.findOne userId: userId
